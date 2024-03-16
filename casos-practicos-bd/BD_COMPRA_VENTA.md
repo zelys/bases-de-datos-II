@@ -45,36 +45,34 @@ USE compra_venta_vehiculos;
 
 /* Se crean las tablas */
 CREATE TABLE propietario (
-    id_cliente INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    rut_cliente CHAR(10) NOT NULL UNIQUE,
+    rut_cli CHAR(10) NOT NULL UNIQUE PRIMARY KEY,
     nombre_cliente VARCHAR(50) NOT NULL,
     direccion_cliente VARCHAR(100)
 );
 
 CREATE TABLE vehiculo (
-    id_vehiculo INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
-    patente CHAR(6) NOT NULL UNIQUE,
+    patente CHAR(6) NOT NULL UNIQUE PRIMARY KEY,
     marca VARCHAR(20) NOT NULL,
     modelo VARCHAR(20) NOT NULL,
     color VARCHAR(20),
-    id_cliente INT UNSIGNED,
-    FOREIGN KEY(id_cliente) REFERENCES propietario(id_cliente)
+    rut_cli CHAR(10) NOT NULL,
+    FOREIGN KEY(rut_cli) REFERENCES propietario(rut_cli)
 );
 
 /* Se agregar los registros */
-INSERT INTO propietario(rut_cliente, nombre_cliente, direccion_cliente)
+INSERT INTO propietario(rut_cli, nombre_cliente, direccion_cliente)
 VALUES
 ('13457305-9', 'Ana Castro', 'Av. Carmen 1680 Recoleta'),
 ('20242591-K', 'José Mora', 'Alonso Ovalle 240 La Reina'),
 ('18357596-6','Luis Parodi','Arturo Prat 4410 Santiago Centro');
 
-INSERT INTO vehiculo(patente, marca, modelo, color, id_cliente)
+INSERT INTO vehiculo(patente, marca, modelo, color, rut_cli)
 VALUES
-('VGRT22', 'Suzuki', 'Alto', 'Negro', 2),
-('LCSH97', 'Subaru', 'Forester', 'Gris', 1),
-('ANTH21', 'Mahindra', 'Scorpio', 'Blanco', 1),
-('LCER43', 'Suzuki', 'Alto', 'Negro', 2),
-('AGDW32', 'Chevrolet', 'Spark II', 'Rojo', 2);
+('VGRT22', 'Suzuki', 'Alto', 'Negro', '20242591-K'),
+('LCSH97', 'Subaru', 'Forester', 'Gris', '13457305-9'),
+('ANTH21', 'Mahindra', 'Scorpio', 'Blanco', '13457305-9'),
+('LCER43', 'Suzuki', 'Alto', 'Negro', '20242591-K'),
+('AGDW32', 'Chevrolet', 'Spark II', 'Rojo', '20242591-K');
 ```
 
 2. Desarrollar las siguientes consultas:
@@ -89,10 +87,10 @@ SELECT marca, COUNT(*) AS total FROM vehiculo GROUP BY marca;
 +-----------+-------+
 | marca     | total |
 +-----------+-------+
+| Chevrolet |     1 |
+| Mahindra  |     1 |
 | Suzuki    |     2 |
 | Subaru    |     1 |
-| Mahindra  |     1 |
-| Chevrolet |     1 |
 +-----------+-------+
 ```
 
@@ -100,7 +98,7 @@ SELECT marca, COUNT(*) AS total FROM vehiculo GROUP BY marca;
 
 ```sql
 SELECT p.nombre_cliente, v.patente, v.marca, v.modelo FROM vehiculo v
-JOIN propietario p ON v.id_cliente = p.id_cliente
+JOIN propietario p ON v.rut_cli = p.rut_cli
 WHERE p.nombre_cliente = 'José Mora'
 GROUP BY v.patente;
 ```
@@ -109,9 +107,9 @@ GROUP BY v.patente;
 +----------------+---------+-----------+----------+
 | nombre_cliente | patente | marca     | modelo   |
 +----------------+---------+-----------+----------+
-| José Mora      | VGRT22  | Suzuki    | Alto     |
-| José Mora      | LCER43  | Suzuki    | Alto     |
 | José Mora      | AGDW32  | Chevrolet | Spark II |
+| José Mora      | LCER43  | Suzuki    | Alto     |
+| José Mora      | VGRT22  | Suzuki    | Alto     |
 +----------------+---------+-----------+----------+
 ```
 
@@ -121,12 +119,13 @@ GROUP BY v.patente;
 CREATE OR REPLACE VIEW vista_reporte
 AS SELECT v.patente, v.marca, p.nombre_cliente
 FROM vehiculo v
-JOIN propietario p ON v.id_cliente = p.id_cliente
+JOIN propietario p ON v.rut_cli = p.rut_cli
 WHERE v.marca = 'Mahindra' OR v.marca = 'Suzuki'
 ORDER BY v.patente ASC;
 ```
 
 ```sh
+mysql> SELECT * FROM vista_reporte;
 +---------+----------+----------------+
 | patente | marca    | nombre_cliente |
 +---------+----------+----------------+
@@ -135,3 +134,4 @@ ORDER BY v.patente ASC;
 | VGRT22  | Suzuki   | José Mora      |
 +---------+----------+----------------+
 ```
+
