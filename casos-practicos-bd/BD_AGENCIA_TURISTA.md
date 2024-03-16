@@ -154,7 +154,7 @@ GROUP BY r.nombre_region;
 ```
 
 ```sh
-mysql> select * from vista_001;
+mysql> SELECT * FROM vista_001;
 +--------------------------------+----------------+
 | nombre_region                  | total_ciudades |
 +--------------------------------+----------------+
